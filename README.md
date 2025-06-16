@@ -11,3 +11,5 @@ Steps to run:
   3. python -m streamlit run app.py
   (after running the 3rd step it generates a local host which when visited show the the chatbot.)
   
+The code in chatbot.py is the code that I used for deploying the app using streamlit share.
+You can deploy it here "https://share.streamlit.io/".
