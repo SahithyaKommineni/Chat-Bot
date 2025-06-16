@@ -239,7 +239,7 @@ class MistralClient:
     def generate_response(self, message: str) -> str:
         """Generate response from Mistral API"""
         if not self.api_key or self.api_key == "your-mistral-api-key-here":
-            return " Please add your Mistral API key to use the real AI model. Get one from https://console.mistral.ai/"
+            return "⚠️ Please add your Mistral API key to use the real AI model. Get one from https://console.mistral.ai/"
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -261,17 +261,17 @@ class MistralClient:
             return response.json()["choices"][0]["message"]["content"]
         except requests.exceptions.RequestException as e:
             if "401" in str(e):
-                return " Invalid API key. Please check your Mistral API key."
+                return "❌ Invalid API key. Please check your Mistral API key."
             elif "429" in str(e):
-                return " Rate limit exceeded. Please wait a moment and try again."
+                return "⏳ Rate limit exceeded. Please wait a moment and try again."
             elif "500" in str(e):
-                return " Mistral API is temporarily unavailable. Please try again later."
+                return "🔧 Mistral API is temporarily unavailable. Please try again later."
             else:
-                return f" API Error: {str(e)}"
+                return f"⚠️ API Error: {str(e)}"
         except KeyError:
-            return " Error: Invalid response format from API"
+            return "❌ Error: Invalid response format from API"
         except Exception as e:
-            return f" Unexpected error: {str(e)}"
+            return f"⚠️ Unexpected error: {str(e)}"
 
 def main():
     # Title
@@ -305,8 +305,13 @@ def main():
         # Add user message to chat
         st.session_state.messages.append({"role": "user", "content": user_input})
         
-        # Initialize Mistral client with your API key
-        api_key = "mistral-api-key-here"  # 👈 REPLACE THIS WITH YOUR ACTUAL API KEY
+        # Initialize Mistral client with API key from secrets
+        try:
+            api_key = st.secrets["MISTRAL_API_KEY"]
+        except KeyError:
+            api_key = None
+            st.error("🔑 MISTRAL_API_KEY not found in secrets. Please add it in Streamlit Cloud settings.")
+        
         client = MistralClient(api_key, "mistral-small")
         
         # Show loading spinner
